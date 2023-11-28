@@ -1,0 +1,67 @@
+---
+import Layout from "../../layouts/default.astro";
+import { wpquery } from "../../data/wordpress";
+
+export async function getStaticPaths() {
+  const data = await wpquery({
+    query: `
+      query ListWorkDetails {
+        allWork {
+          nodes {
+            id
+            slug
+            title
+            content(format: RENDERED)
+            featuredImage {
+              node {
+                altText
+                mediaItemUrl
+                srcSet
+              }
+            }
+            workfields {
+              customImage {
+                altText
+                mediaItemUrl
+                srcSet
+              }
+            }
+          }
+        }
+      }
+    `,
+  });
+
+  return data.allWork.nodes.map((post: any) => {
+    return {
+      params: { slug: post.slug },
+      props: { post },
+    };
+  });
+}
+
+const { post } = Astro.props;
+---
+
+<Layout title="An Example Blog Post">
+  <img
+    src={post["featuredImage"]["node"]["mediaItemUrl"]}
+    srcset={post["featuredImage"]["node"]["srcSet"]}
+    sizes={post["featuredImage"]["node"]["sizes"]}
+    alt={post["featuredImage"]["node"]["alt"]}
+  />
+
+  <h1>{post["title"]}</h1>
+  <Fragment set:html={post["content"]} />
+
+  <p>
+    <a href="/">&larr; back to all posts</a>
+  </p>
+
+  <img
+    src={post["workfields"]["customImage"]["mediaItemUrl"]}
+    srcset={post["cworkfields"]["ccustomImage"]["csrcSet"]}
+    sizes={post["cworkfields"]["ccustomImage"]["csizes"]}
+    alt={post["cworkfields"]["ccustomImage"]["calt"]}
+  />
+</Layout>

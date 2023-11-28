@@ -1,0 +1,45 @@
+---
+import Layout from "../layouts/default.astro";
+import { wpquery } from "../data/wordpress.ts";
+
+const data = await wpquery({
+  query: `query ListWork{
+  allWork {
+    nodes {
+      id
+      slug
+      title
+      featuredImage {
+        node {
+          altText
+          mediaItemUrl
+          srcSet
+        }
+      }
+    }
+  }
+}
+	`,
+});
+---
+
+<Layout title="AstroBoyyy™">
+  <h1>Work</h1>
+  {
+    data.allWork.nodes.map((post: any) => {
+      return (
+        <article>
+          <a href={`/work/${post.slug}`}>
+            <h2>{post.title}</h2>
+            <img
+              src={post.featuredImage.node.mediaItemUrl}
+              srcset={post.featuredImage.node.srcSet}
+              sizes={post.featuredImage.node.sizes}
+              alt={post.featuredImage.node.altText}
+            />
+          </a>
+        </article>
+      );
+    })
+  }
+</Layout>
